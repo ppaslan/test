@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+  L4 fixture: CSS forms that must not blank a real page (aegis-swarm 0926).
+
+  A realistic small article page (nav / article / aside / footer) styled the way real sites are,
+  including several selector shapes that the spec explicitly requires to hide nothing because
+  their subject names no class, id or attribute (visible.py _readings/_rules; egress-gateway.md
+  "text it hides in a browser is kept" and the "gateway content first" rule: the simplest
+  class-removing reading must not blank a real page). One genuine, correctly class-scoped ad
+  banner is included as a positive control, so the corpus proves the mechanism removes what it
+  should and nothing else.
+
+  Every paragraph of real content carries a unique ART-<n> token. All ART-<n> tokens are expected
+  PRESENT. AD-BANNER is expected ABSENT (it is the one rule that legitimately, correctly hides).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>L4 fixture: CSS forms (title is stripped)</title>
+  <style>
+    /* Looks broad, hides nothing: subject is a bare type + a positional pseudo-class, a
+       condition the gateway does not read (visible.py: "with a condition not read
+       (li:first-child, div:has(.x)) it hides nothing"). */
+    nav li:first-child { display: none; }
+
+    /* Looks broad, hides nothing: unnamed child of an unnamed parent ("body > div" is the
+       spec's own worked example of a rule that hides nothing). */
+    body > div { display: none; }
+
+    /* Looks broad, hides nothing: a universal selector after a sibling combinator. */
+    .card + * { visibility: hidden; }
+
+    /* Looks broad, hides nothing: a bare type selector alone, no class/id/attribute. */
+    p { text-indent: 0; }
+    article > p:not(:first-child) { opacity: 1; }
+
+    /* :has() is not read; a rule built on it is a condition-not-read case. */
+    div:has(.no-such-marker) { display: none; }
+
+    /* Print-only media: correctly skipped for a fetched (screen) read, so it must not remove
+       anything from the normal reading either way. */
+    @media print { .article-body { display: none; } }
+
+    /* The one rule that legitimately, correctly hides real content, scoped to a real class: */
+    .ad-banner { display: none; }
+  </style>
+</head>
+<body>
+
+<p id="control">VIS-CONTROL: this fixture page loaded and its ordinary text is visible.</p>
+
+<header>
+  <h1>ART-01: Example Weekly — front page</h1>
+  <nav>
+    <ul>
+      <li>ART-02: Home (nav li:first-child target -- must remain visible)</li>
+      <li>ART-03: Archive</li>
+      <li>ART-04: About</li>
+    </ul>
+  </nav>
+</header>
+
+<div class="ad-banner">AD-BANNER (correctly, narrowly hidden -- expected ABSENT)</div>
+
+<main>
+  <article class="article-body">
+    <p>ART-05: This is the first paragraph of the real article. It must survive every selector
+      above that looks broad but is not read by the gateway's fail-closed reduction.</p>
+    <p>ART-06: This is the second paragraph (targeted by "article &gt; p:not(:first-child)",
+      which only sets opacity back to 1 and changes nothing either way).</p>
+    <div class="card">
+      <p>ART-07: A card component, unaffected by ".card + *" on itself (the combinator applies
+        to what follows the card, not the card).</p>
+    </div>
+    <p>ART-08: The paragraph immediately after the card. Targeted by ".card + *", which is a
+      sibling combinator and so, per the spec, hides nothing.</p>
+  </article>
+  <aside>
+    <div>
+      <p>ART-09: A sidebar paragraph, inside an unnamed div under body's descendant chain
+        (not a direct child of body, so "body &gt; div" does not even reach it structurally;
+        included as a plain content-survival control).</p>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  <p>ART-10: Footer text. VIS-CONTROL-END: this line is ordinary and visible.</p>
+</footer>
+
+</body>
+</html>
