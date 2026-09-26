@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!--
+  L4 fixture: hidden-text corpus (aegis-swarm 0926).
+
+  One row per hiding-rule family read from
+  /home/zero/aegis/services/python/gateway/src/aegis/gateway/parse/document.py (which points at
+  visible.py's _HIDING tuple and clean()) plus the three residuals stated in
+  docs/engineering/egress-gateway.md's "Accepted residuals" table:
+    1. "What the hiding rules miss" (a hiding attempt using a technique the code does not read)
+    2. "Content after </body>"
+    3. "Other visible-text limits" (a closed <details>; an image-only link)
+
+  Every row has a VIS-<n> token (kept, control) and a HID-<n> token (the family's test): for a
+  real hiding rule the HID token must be ABSENT from fetch()'s text; for a residual it is
+  expected PRESENT (still marked), per the L4 pass criterion "hidden tokens are absent, except
+  the residuals, which arrive marked". Checking is a plain substring search over the raw
+  fetch() text -- see prep/l4/README.md for the exact per-row expectation table.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>L4 fixture: hidden text (title is a removed element; must not appear)</title>
+  <style>
+    /* Row 1: display */
+    .r1 { display: none; }
+    /* Row 2: visibility */
+    .r2 { visibility: hidden; }
+    /* Row 3: content-visibility */
+    .r3 { content-visibility: hidden; }
+    /* Row 4: opacity */
+    .r4 { opacity: 0.01; }
+    /* Row 5: filter: opacity() */
+    .r5 { filter: opacity(2%); }
+    /* Row 6: font-size */
+    .r6 { font-size: 0.5px; }
+    /* Row 7: text-indent */
+    .r7 { text-indent: -3000px; }
+    /* Row 8: clip (collapsed rect) */
+    .r8 { position: absolute; clip: rect(1px, 1px, 1px, 1px); }
+    /* Row 9: clip-path (zero-radius circle) */
+    .r9 { clip-path: circle(0px); }
+    /* Row 10: size (tiny box + overflow hidden) */
+    .r10 { width: 1px; height: 1px; overflow: hidden; }
+    /* Row 11: offscreen (position + far negative offset) */
+    .r11 { position: absolute; left: -9999px; top: -9999px; }
+    /* Row 12: margin (far negative top/left margin) */
+    .r12 { margin-top: -6000px; }
+    /* Row 13: transform (scale below 0.05) */
+    .r13 { transform: scale(0.01); }
+    /* Row 14: scale property */
+    .r14 { scale: 0.01; }
+    /* Row 15: translate property (far negative) */
+    .r15 { translate: -2000px 0; }
+
+    /* Residual 1a: text coloured like its background -- the cascade/paint is not evaluated */
+    .res1a { color: #ffffff; background-color: #ffffff; }
+    /* Residual 1b: a hiding value carried through a custom property (var()) */
+    :root { --hide-me: none; }
+    .res1b { display: var(--hide-me); }
+    /* Residual 1c: a rule whose subject names no class/id/attribute and whose rest is only
+       partly read -- explicitly listed in the spec/doc as "hides nothing": */
+    li:first-child { display: none; }
+    body > div.res1c-wrap { display: none; }
+  </style>
+</head>
+<body>
+
+<p id="control">VIS-CONTROL: this fixture page loaded and its ordinary text is visible.</p>
+
+<!-- Row 1: display:none -->
+<p>VIS-01 before.</p>
+<p class="r1">HID-01 (display:none)</p>
+
+<!-- Row 2: visibility:hidden -->
+<p>VIS-02 before.</p>
+<p class="r2">HID-02 (visibility:hidden)</p>
+
+<!-- Row 3: content-visibility:hidden -->
+<p>VIS-03 before.</p>
+<p class="r3">HID-03 (content-visibility:hidden)</p>
+
+<!-- Row 4: opacity below 0.05 -->
+<p>VIS-04 before.</p>
+<p class="r4">HID-04 (opacity:0.01)</p>
+
+<!-- Row 5: filter: opacity() below 0.05 -->
+<p>VIS-05 before.</p>
+<p class="r5">HID-05 (filter:opacity(2%))</p>
+
+<!-- Row 6: font-size below 1px -->
+<p>VIS-06 before.</p>
+<p class="r6">HID-06 (font-size:0.5px)</p>
+
+<!-- Row 7: text-indent at/beyond -1000px -->
+<p>VIS-07 before.</p>
+<p class="r7">HID-07 (text-indent:-3000px)</p>
+
+<!-- Row 8: clip collapsing the box -->
+<p>VIS-08 before.</p>
+<p class="r8">HID-08 (clip:rect collapsed)</p>
+
+<!-- Row 9: clip-path enclosing no area -->
+<p>VIS-09 before.</p>
+<p class="r9">HID-09 (clip-path:circle(0px))</p>
+
+<!-- Row 10: tiny box + overflow hidden -->
+<p>VIS-10 before.</p>
+<p class="r10">HID-10 (1px box, overflow:hidden)</p>
+
+<!-- Row 11: offscreen absolute/fixed -->
+<p>VIS-11 before.</p>
+<p class="r11">HID-11 (position:absolute; left/top -9999px)</p>
+
+<!-- Row 12: far negative top/left margin -->
+<p>VIS-12 before.</p>
+<p class="r12">HID-12 (margin-top:-6000px)</p>
+
+<!-- Row 13: transform scale below 0.05 -->
+<p>VIS-13 before.</p>
+<p class="r13">HID-13 (transform:scale(0.01))</p>
+
+<!-- Row 14: scale property below 0.05 -->
+<p>VIS-14 before.</p>
+<p class="r14">HID-14 (scale:0.01)</p>
+
+<!-- Row 15: translate property far negative -->
+<p>VIS-15 before.</p>
+<p class="r15">HID-15 (translate:-2000px 0)</p>
+
+<!-- Row 16: hidden attribute -->
+<p>VIS-16 before.</p>
+<p hidden>HID-16 (hidden attribute)</p>
+
+<!-- Row 17: inert attribute -->
+<p>VIS-17 before.</p>
+<p inert>HID-17 (inert attribute)</p>
+
+<!-- Row 18: aria-hidden="true" -->
+<p>VIS-18 before.</p>
+<p aria-hidden="true">HID-18 (aria-hidden=true)</p>
+
+<!-- Row 19: removed element -- noscript -->
+<p>VIS-19 before.</p>
+<noscript>HID-19 (inside noscript, removed subtree)</noscript>
+
+<!-- Row 20: removed element -- template (never unwrapped) -->
+<p>VIS-20 before.</p>
+<template>HID-20 (inside template, removed and never unwrapped)</template>
+
+<!-- Residual 1a: text coloured like its background -- the cascade/paint is not evaluated, so
+     this reaches the agent even though a human reader would see nothing. -->
+<p>VIS-RES1A before.</p>
+<p class="res1a">RES-1A (white-on-white; cascade/paint not evaluated -- expected PRESENT)</p>
+
+<!-- Residual 1b: hiding value through var() -- resolving var() needs the cascade, which is out
+     of scope, so the element stays visible to the gateway. -->
+<p>VIS-RES1B before.</p>
+<p class="res1b">RES-1B (display:var(--hide-me); var() not resolved -- expected PRESENT)</p>
+
+<!-- Residual 1c: selectors whose subject names no class/id/attribute (li:first-child,
+     "body > div" with an unnamed child) -- explicitly "hides nothing" by design. -->
+<ul>
+  <li>RES-1C-LI (li:first-child target; rule hides nothing -- expected PRESENT)</li>
+  <li>VIS-RES1C-LI2 (second list item, unaffected either way)</li>
+</ul>
+<div class="res1c-wrap">RES-1C-DIV (body &gt; div.res1c-wrap; unnamed-child rule hides nothing -- expected PRESENT)</div>
+
+<!-- Residual 3a: a closed <details> is kept -- a reader can open it, so the gateway keeps it
+     even though it renders collapsed by default. -->
+<p>VIS-RES3A before.</p>
+<details>
+  <summary>RES-3A-SUMMARY (details summary)</summary>
+  RES-3A-BODY (closed details content -- expected PRESENT, per design)
+</details>
+
+<!-- Residual 3b: an image-only link offers no text and so mints no reference; alt text is
+     stripped like every other attribute but href/class/id. Expect no ref for this href and no
+     RES-3B token of any kind in the text or in links[]. -->
+<p>VIS-RES3B before.</p>
+<p><a href="https://example.invalid/res-3b-image-only-link"><img src="pixel.png" alt="RES-3B-ALT (must not appear; alt is stripped)"></a></p>
+
+<p>VIS-CONTROL-END: this line is ordinary and visible, at the end of the documented body.</p>
+
+</body>
+<!-- Residual 2: content after </body>. What libxml2 leaves here (and text directly under
+     <html>) is dropped before any other check runs, even though a browser would render it as
+     part of the body. Expected ABSENT. -->
+<p>RES-2-AFTERBODY (text after &lt;/body&gt; -- expected ABSENT, dropped by design)</p>
+</html>
