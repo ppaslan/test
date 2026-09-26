@@ -2,10 +2,9 @@
 <!--
   L4 fixture: hidden-text corpus (aegis-swarm 0926).
 
-  One row per hiding-rule family read from
-  /home/zero/aegis/services/python/gateway/src/aegis/gateway/parse/document.py (which points at
-  visible.py's _HIDING tuple and clean()) plus the three residuals stated in
-  docs/engineering/egress-gateway.md's "Accepted residuals" table:
+  One row per hiding-rule family read from the gateway's document parser (which points at
+  visible.py's _HIDING tuple and clean()) plus the three residuals stated in the gateway's
+  "Accepted residuals" documentation table:
     1. "What the hiding rules miss" (a hiding attempt using a technique the code does not read)
     2. "Content after </body>"
     3. "Other visible-text limits" (a closed <details>; an image-only link)
